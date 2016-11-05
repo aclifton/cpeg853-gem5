@@ -116,6 +116,11 @@ class DefaultDecode
     /** Sets pointer to time buffer used to communicate to the next stage. */
     void setDecodeQueue(TimeBuffer<DecodeStruct> *dq_ptr);
 
+    ////Group D////
+    /** Sets pointer to time buffer used to communicate to the next stage. */
+    void setDecodeQueueDup(TimeBuffer<DecodeStruct> *dq_ptr);
+    ////Group D////
+
     /** Sets pointer to time buffer coming from fetch. */
     void setFetchQueue(TimeBuffer<FetchStruct> *fq_ptr);
 
@@ -228,6 +233,14 @@ class DefaultDecode
 
     /** Wire used to write any information heading to rename. */
     typename TimeBuffer<DecodeStruct>::wire toRename;
+
+    ////Group D////
+    /** Duplicated Decode instruction queue. */
+    TimeBuffer<DecodeStruct> *decodeQueueDup;
+
+    /** Wire used to write any information heading to rename. */
+    typename TimeBuffer<DecodeStruct>::wire toRenameDup;
+    ////Group D////
 
     /** Fetch instruction queue interface. */
     TimeBuffer<FetchStruct> *fetchQueue;
