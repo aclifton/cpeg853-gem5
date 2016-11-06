@@ -537,6 +537,15 @@ class FullO3CPU : public BaseO3CPU
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iew;
 
+    ////Group D////
+    /** The dispatch stage. */
+    typename CPUPolicy::Rename renameDup;
+
+    /** The issue/execute/writeback stages. */
+    typename CPUPolicy::IEW iewDup;
+    ////Group D////
+
+
     /** The commit stage. */
     typename CPUPolicy::Commit commit;
 
@@ -607,8 +616,18 @@ class FullO3CPU : public BaseO3CPU
     /** The rename stage's instruction queue. */
     TimeBuffer<RenameStruct> renameQueue;
 
+    ////Group D////
+    /** The duplicated decode stage's instruction queue. */
+    TimeBuffer<DecodeStruct> decodeQueueDup;
+
+    /** The duplicated rename stage's instruction queue. */
+    TimeBuffer<RenameStruct> renameQueueDup;
+    ////Group D////
+
     /** The IEW stage's instruction queue. */
     TimeBuffer<IEWStruct> iewQueue;
+
+
 
   private:
     /** The activity recorder; used to tell if the CPU has any

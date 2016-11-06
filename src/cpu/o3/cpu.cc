@@ -190,6 +190,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       fetchQueue(params->backComSize, params->forwardComSize),
       decodeQueue(params->backComSize, params->forwardComSize),
       renameQueue(params->backComSize, params->forwardComSize),
+      ////Group D////
+      decodeQueueDup(params->backComSize, params->forwardComSize),
+      renameQueueDup(params->backComSize, params->forwardComSize),
+      ///Group D////
       iewQueue(params->backComSize, params->forwardComSize),
       activityRec(name(), NumStages,
                   params->backComSize + params->forwardComSize,
@@ -228,6 +232,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setActiveThreads(&activeThreads);
     rename.setActiveThreads(&activeThreads);
     iew.setActiveThreads(&activeThreads);
+    ////Group D////
+    renameDup.setActiveThreads(&activeThreads);
+    iewDup.setActiveThreads(&activeThreads);
+    ////Group D////
     commit.setActiveThreads(&activeThreads);
 
     // Give each of the stages the time buffer they will use.
@@ -235,6 +243,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setTimeBuffer(&timeBuffer);
     rename.setTimeBuffer(&timeBuffer);
     iew.setTimeBuffer(&timeBuffer);
+    ////Group D////
+    renameDup.setTimeBuffer(&timeBuffer);
+    iewDup.setTimeBuffer(&timeBuffer);
+    ////Group D////
     commit.setTimeBuffer(&timeBuffer);
 
     // Also setup each of the stages' queues.
@@ -244,6 +256,11 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setDecodeQueue(&decodeQueue);
     rename.setDecodeQueue(&decodeQueue);
     rename.setRenameQueue(&renameQueue);
+    ////Group D////
+    decode.setDecodeQueueDup(&decodeQueueDup);
+    renameDup.setDecodeQueue(&decodeQueueDup);
+    renameDup.setRenameQueue(&renameQueueDup);
+    ////Group D////
     iew.setRenameQueue(&renameQueue);
     iew.setIEWQueue(&iewQueue);
     commit.setIEWQueue(&iewQueue);
