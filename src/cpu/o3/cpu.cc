@@ -166,7 +166,13 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       fetch(this, params),
       decode(this, params),
       rename(this, params),
+      ////Group D////
+      renameDup(this, params),
+      ////Group D////
       iew(this, params),
+      ////Group D////
+      iewDup(this, params),
+      ////Group D////
       commit(this, params),
 
       regFile(params->numPhysIntRegs,
@@ -256,11 +262,6 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setDecodeQueue(&decodeQueue);
     rename.setDecodeQueue(&decodeQueue);
     rename.setRenameQueue(&renameQueue);
-    ////Group D////
-    decode.setDecodeQueueDup(&decodeQueueDup);
-    renameDup.setDecodeQueue(&decodeQueueDup);
-    renameDup.setRenameQueue(&renameQueueDup);
-    ////Group D////
     iew.setRenameQueue(&renameQueue);
     iew.setIEWQueue(&iewQueue);
     commit.setIEWQueue(&iewQueue);
@@ -269,6 +270,17 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     commit.setIEWStage(&iew);
     rename.setIEWStage(&iew);
     rename.setCommitStage(&commit);
+
+    ////Group D////
+    decode.setDecodeQueueDup(&decodeQueueDup);
+    renameDup.setDecodeQueue(&decodeQueueDup);
+    renameDup.setRenameQueue(&renameQueueDup);
+    iewDup.setRenameQueue(&renameQueueDup);
+    iewDup.setIEWQueue(&iewQueue);
+    renameDup.setIEWStage(&iew);
+    renameDup.setCommitStage(&commit);
+
+    ////Group D////
 
     ThreadID active_threads;
     if (FullSystem) {
@@ -289,6 +301,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     assert(params->numPhysCCRegs >= numThreads * TheISA::NumCCRegs);
 
     rename.setScoreboard(&scoreboard);
+    ///Group D///
+    //renameDup.setScoreboard(&scoreboard);
+    ///Group D///
+
     iew.setScoreboard(&scoreboard);
 
     // Setup the rename map for whichever stages need it.
@@ -505,6 +521,10 @@ FullO3CPU<Impl>::regStats()
     this->fetch.regStats();
     this->decode.regStats();
     this->rename.regStats();
+    ////Group D////
+    this->renameDup.regStats();
+    this->iewDup.regStats();
+    ////Group D////
     this->iew.regStats();
     this->commit.regStats();
     this->rob.regStats();
@@ -649,6 +669,9 @@ FullO3CPU<Impl>::startup()
     decode.startupStage();
     iew.startupStage();
     rename.startupStage();
+    ////Group D////
+    renameDup.startupStage();
+    ////Group D////
     commit.startupStage();
 }
 

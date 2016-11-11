@@ -534,13 +534,15 @@ class FullO3CPU : public BaseO3CPU
     /** The dispatch stage. */
     typename CPUPolicy::Rename rename;
 
+    ////Group D////
+    /** The dispatch stage. */
+    typename CPUPolicy::Rename renameDup;
+    ////Group D////
+
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iew;
 
     ////Group D////
-    /** The dispatch stage. */
-    typename CPUPolicy::Rename renameDup;
-
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iewDup;
     ////Group D////

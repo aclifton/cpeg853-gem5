@@ -570,7 +570,7 @@ DefaultDecode<Impl>::tick()
 
     toRenameIndex = 0;
     ////Group D////
-    toRenameDupIndex = 0;
+    //toRenameDupIndex = 0;
     ////Group D////
 
     list<ThreadID>::iterator threads = activeThreads->begin();
@@ -716,7 +716,7 @@ DefaultDecode<Impl>::decodeInsts(ThreadID tid)
         ////Group D////
         toRenameDup->insts[toRenameIndex] = inst;
         ++(toRenameDup->size);
-        ++toRenameDupIndex;
+        //++toRenameDupIndex;
         ////Group D////
 
         ++decodeDecodedInsts;
