@@ -60,7 +60,8 @@
 using namespace std;
 
 template <class Impl>
-DefaultRename<Impl>::DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params)
+DefaultRename<Impl>::DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params,
+                                   bool redundant)
     : cpu(_cpu),
       iewToRenameDelay(params->iewToRenameDelay),
       decodeToRenameDelay(params->decodeToRenameDelay),
@@ -71,6 +72,7 @@ DefaultRename<Impl>::DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params)
       maxPhysicalRegs(params->numPhysIntRegs + params->numPhysFloatRegs
                       + params->numPhysCCRegs)
 {
+    this->setRedundant(redundant);
     if (renameWidth > Impl::MaxWidth)
         fatal("renameWidth (%d) is larger than compiled limit (%d),\n"
              "\tincrease MaxWidth in src/cpu/o3/impl.hh\n",
@@ -81,10 +83,17 @@ DefaultRename<Impl>::DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params)
 }
 
 template <class Impl>
+DefaultRename<Impl>::DefaultRename(O3CPU *_cpu, DerivO3CPUParams *params)
+    : DefaultRename(_cpu,params,false)
+{
+}
+
+template <class Impl>
 std::string
 DefaultRename<Impl>::name() const
 {
-    return cpu->name() + ".rename";
+    //Group D mod. Used to avoid stat naming conflicts
+    return cpu->name() + ".rename." + RedundantObject::name();
 }
 
 template <class Impl>

@@ -166,13 +166,13 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       fetch(this, params),
       decode(this, params),
       rename(this, params),
-      ////Group D////
-      renameDup(this, params),
-      ////Group D////
+      /* Group D */
+      renameDup(this, params, true),
+      /* Group D */
       iew(this, params),
-      ////Group D////
-      iewDup(this, params),
-      ////Group D////
+      /* Group D */
+      iewDup(this, params, true),
+      /* Group D */
       commit(this, params),
 
       regFile(params->numPhysIntRegs,
@@ -196,7 +196,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       fetchQueue(params->backComSize, params->forwardComSize),
       decodeQueue(params->backComSize, params->forwardComSize),
       renameQueue(params->backComSize, params->forwardComSize),
-      ////Group D////
+      /* Group D */
       decodeQueueDup(params->backComSize, params->forwardComSize),
       renameQueueDup(params->backComSize, params->forwardComSize),
       ///Group D////
@@ -238,10 +238,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setActiveThreads(&activeThreads);
     rename.setActiveThreads(&activeThreads);
     iew.setActiveThreads(&activeThreads);
-    ////Group D////
+    /* Group D */
     renameDup.setActiveThreads(&activeThreads);
     iewDup.setActiveThreads(&activeThreads);
-    ////Group D////
+    /* Group D */
     commit.setActiveThreads(&activeThreads);
 
     // Give each of the stages the time buffer they will use.
@@ -249,10 +249,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setTimeBuffer(&timeBuffer);
     rename.setTimeBuffer(&timeBuffer);
     iew.setTimeBuffer(&timeBuffer);
-    ////Group D////
+    /* Group D */
     renameDup.setTimeBuffer(&timeBuffer);
     iewDup.setTimeBuffer(&timeBuffer);
-    ////Group D////
+    /* Group D */
     commit.setTimeBuffer(&timeBuffer);
 
     // Also setup each of the stages' queues.
@@ -271,7 +271,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     rename.setIEWStage(&iew);
     rename.setCommitStage(&commit);
 
-    ////Group D////
+    /* Group D */
     decode.setDecodeQueueDup(&decodeQueueDup);
     renameDup.setDecodeQueue(&decodeQueueDup);
     renameDup.setRenameQueue(&renameQueueDup);
@@ -280,7 +280,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     renameDup.setIEWStage(&iew);
     renameDup.setCommitStage(&commit);
 
-    ////Group D////
+    /* Group D */
 
     ThreadID active_threads;
     if (FullSystem) {
@@ -521,10 +521,10 @@ FullO3CPU<Impl>::regStats()
     this->fetch.regStats();
     this->decode.regStats();
     this->rename.regStats();
-    ////Group D////
+    /* Group D */
     this->renameDup.regStats();
     this->iewDup.regStats();
-    ////Group D////
+    /* Group D */
     this->iew.regStats();
     this->commit.regStats();
     this->rob.regStats();
@@ -590,7 +590,14 @@ FullO3CPU<Impl>::tick()
 
     rename.tick();
 
+    /* Group D */
+    renameDup.tick();
+    /* Group D */
+
     iew.tick();
+    /* Group D */
+    iewDup.tick();
+    /* Group D */
 
     commit.tick();
 
@@ -599,7 +606,13 @@ FullO3CPU<Impl>::tick()
 
     fetchQueue.advance();
     decodeQueue.advance();
+    /* Group D */
+    decodeQueueDup.advance();
+    /* Group D */
     renameQueue.advance();
+    /* Group D */
+    renameQueueDup.advance();
+    /* Group D */
     iewQueue.advance();
 
     activityRec.advance();
@@ -669,9 +682,9 @@ FullO3CPU<Impl>::startup()
     decode.startupStage();
     iew.startupStage();
     rename.startupStage();
-    ////Group D////
+    /* Group D */
     renameDup.startupStage();
-    ////Group D////
+    /* Group D */
     commit.startupStage();
 }
 
