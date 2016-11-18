@@ -302,7 +302,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
 
     rename.setScoreboard(&scoreboard);
     ///Group D///
-    //renameDup.setScoreboard(&scoreboard);
+    renameDup.setScoreboard(&scoreboard);
     ///Group D///
 
     iew.setScoreboard(&scoreboard);
@@ -352,6 +352,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     rename.setRenameMap(renameMap);
     commit.setRenameMap(commitRenameMap);
     rename.setFreeList(&freeList);
+    /* Group D */
+    renameDup.setRenameMap(renameMap);
+    renameDup.setFreeList(&freeList);
+    /* Group D */
 
     // Setup the ROB for whichever stages need it.
     commit.setROB(&rob);
@@ -449,6 +453,9 @@ FullO3CPU<Impl>::regProbePoints()
 
     fetch.regProbePoints();
     rename.regProbePoints();
+    /* Group D */
+    renameDup.regProbePoints();
+    /* Group D */
     iew.regProbePoints();
     commit.regProbePoints();
 }
@@ -1129,6 +1136,10 @@ FullO3CPU<Impl>::drainSanityCheck() const
     decode.drainSanityCheck();
     rename.drainSanityCheck();
     iew.drainSanityCheck();
+    /* Group D */
+    renameDup.drainSanityCheck();
+    iewDup.drainSanityCheck();
+    /* Group D */
     commit.drainSanityCheck();
 }
 
@@ -1230,6 +1241,10 @@ FullO3CPU<Impl>::takeOverFrom(BaseCPU *oldCPU)
     decode.takeOverFrom();
     rename.takeOverFrom();
     iew.takeOverFrom();
+    /* Group D */
+    renameDup.takeOverFrom();
+    iewDup.takeOverFrom();
+    /* Group D */
     commit.takeOverFrom();
 
     assert(!tickEvent.scheduled());
