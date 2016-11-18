@@ -1103,6 +1103,10 @@ FullO3CPU<Impl>::drain()
             fetchQueue.advance();
             decodeQueue.advance();
             renameQueue.advance();
+            /* Group D */
+            decodeQueueDup.advance();
+            renameQueueDup.advance();
+            /* Group D */
             iewQueue.advance();
         }
 
@@ -1168,6 +1172,17 @@ FullO3CPU<Impl>::isDrained() const
         DPRINTF(Drain, "Rename not drained.\n");
         drained = false;
     }
+
+    /* Group D */
+    if (!renameDup.isDrained()) {
+        DPRINTF(Drain, "RenameDup not drained.\n");
+        drained = false;
+    }
+    if (!iewDup.isDrained()) {
+        DPRINTF(Drain, "IEWDup not drained.\n");
+        drained = false;
+    }
+    /* Group D */
 
     if (!iew.isDrained()) {
         DPRINTF(Drain, "IEW not drained.\n");
