@@ -285,6 +285,10 @@ class DefaultDecode
     /** Index of instructions being sent to rename. */
     unsigned toRenameIndex;
 
+    /* GROUP D */
+    unsigned toRenameDupIndex;
+    /* GROUP D */
+
     /** number of Active Threads*/
     ThreadID numThreads;
 
