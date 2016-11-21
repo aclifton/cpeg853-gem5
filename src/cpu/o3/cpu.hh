@@ -536,6 +536,7 @@ class FullO3CPU : public BaseO3CPU
 
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iew;
+    typename CPUPolicy::IEW iewDup;
 
     /** The commit stage. */
     typename CPUPolicy::Commit commit;
@@ -609,6 +610,7 @@ class FullO3CPU : public BaseO3CPU
 
     /** The IEW stage's instruction queue. */
     TimeBuffer<IEWStruct> iewQueue;
+    TimeBuffer<IEWStruct> iewQueueDup;
 
   private:
     /** The activity recorder; used to tell if the CPU has any

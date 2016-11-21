@@ -167,6 +167,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       decode(this, params),
       rename(this, params),
       iew(this, params),
+      iewDup(this, params),
       commit(this, params),
 
       regFile(params->numPhysIntRegs,
@@ -191,6 +192,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       decodeQueue(params->backComSize, params->forwardComSize),
       renameQueue(params->backComSize, params->forwardComSize),
       iewQueue(params->backComSize, params->forwardComSize),
+      iewQueueDup(params->backComSize, params->forwardComSize),
       activityRec(name(), NumStages,
                   params->backComSize + params->forwardComSize,
                   params->activity),
@@ -228,6 +230,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setActiveThreads(&activeThreads);
     rename.setActiveThreads(&activeThreads);
     iew.setActiveThreads(&activeThreads);
+    iewDup.setActiveThreads(&activeThreads);
     commit.setActiveThreads(&activeThreads);
 
     // Give each of the stages the time buffer they will use.
@@ -235,6 +238,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     decode.setTimeBuffer(&timeBuffer);
     rename.setTimeBuffer(&timeBuffer);
     iew.setTimeBuffer(&timeBuffer);
+    iewDup.setTimeBuffer(&timeBuffer);
     commit.setTimeBuffer(&timeBuffer);
 
     // Also setup each of the stages' queues.
@@ -246,7 +250,9 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     rename.setRenameQueue(&renameQueue);
     iew.setRenameQueue(&renameQueue);
     iew.setIEWQueue(&iewQueue);
-    commit.setIEWQueue(&iewQueue);
+    iewDup.setRenameQueue(&renameQueue);
+    iewDup.setIEWQueue(&iewQueueDup);
+    commit.setIEWQueue(&iewQueue, &iewQueueDup);
     commit.setRenameQueue(&renameQueue);
 
     commit.setIEWStage(&iew);
@@ -273,6 +279,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
 
     rename.setScoreboard(&scoreboard);
     iew.setScoreboard(&scoreboard);
+    iewDup.setScoreboard(&scoreboard);
 
     // Setup the rename map for whichever stages need it.
     for (ThreadID tid = 0; tid < numThreads; tid++) {
@@ -417,6 +424,7 @@ FullO3CPU<Impl>::regProbePoints()
     fetch.regProbePoints();
     rename.regProbePoints();
     iew.regProbePoints();
+    iewDup.regProbePoints();
     commit.regProbePoints();
 }
 
@@ -489,6 +497,7 @@ FullO3CPU<Impl>::regStats()
     this->decode.regStats();
     this->rename.regStats();
     this->iew.regStats();
+    this->iewDup.regStats();
     this->commit.regStats();
     this->rob.regStats();
 
@@ -554,6 +563,7 @@ FullO3CPU<Impl>::tick()
     rename.tick();
 
     iew.tick();
+    iewDup.tick();
 
     commit.tick();
 
@@ -564,6 +574,7 @@ FullO3CPU<Impl>::tick()
     decodeQueue.advance();
     renameQueue.advance();
     iewQueue.advance();
+    iewQueueDup.advance();
 
     activityRec.advance();
 
@@ -631,6 +642,7 @@ FullO3CPU<Impl>::startup()
     fetch.startupStage();
     decode.startupStage();
     iew.startupStage();
+    iewDup.startupStage();
     rename.startupStage();
     commit.startupStage();
 }
@@ -825,6 +837,7 @@ FullO3CPU<Impl>::insertThread(ThreadID tid)
     //Reset ROB/IQ/LSQ Entries
     commit.rob->resetEntries();
     iew.resetEntries();
+    iewDup.resetEntries();
 }
 
 template <class Impl>
@@ -872,12 +885,16 @@ FullO3CPU<Impl>::removeThread(ThreadID tid)
     decode.squash(tid);
     rename.squash(squash_seq_num, tid);
     iew.squash(tid);
+    iewDup.squash(tid);
     iew.ldstQueue.squash(squash_seq_num, tid);
+    iewDup.ldstQueue.squash(squash_seq_num, tid);
     commit.rob->squash(squash_seq_num, tid);
 
 
     assert(iew.instQueue.getCount(tid) == 0);
     assert(iew.ldstQueue.getCount(tid) == 0);
+    assert(iewDup.instQueue.getCount(tid) == 0);
+    assert(iewDup.ldstQueue.getCount(tid) == 0);
 
     // Reset ROB/IQ/LSQ Entries
 
@@ -1044,6 +1061,7 @@ FullO3CPU<Impl>::drain()
             decodeQueue.advance();
             renameQueue.advance();
             iewQueue.advance();
+            iewQueueDup.advance();
         }
 
         drainSanityCheck();
@@ -1076,6 +1094,7 @@ FullO3CPU<Impl>::drainSanityCheck() const
     decode.drainSanityCheck();
     rename.drainSanityCheck();
     iew.drainSanityCheck();
+    iewDup.drainSanityCheck();
     commit.drainSanityCheck();
 }
 
@@ -1107,6 +1126,11 @@ FullO3CPU<Impl>::isDrained() const
 
     if (!iew.isDrained()) {
         DPRINTF(Drain, "IEW not drained.\n");
+        drained = false;
+    }
+
+    if (!iewDup.isDrained()) {
+        DPRINTF(Drain, "IEW Duplicate not drained.\n");
         drained = false;
     }
 
@@ -1177,6 +1201,7 @@ FullO3CPU<Impl>::takeOverFrom(BaseCPU *oldCPU)
     decode.takeOverFrom();
     rename.takeOverFrom();
     iew.takeOverFrom();
+    iewDup.takeOverFrom();
     commit.takeOverFrom();
 
     assert(!tickEvent.scheduled());

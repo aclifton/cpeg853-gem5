@@ -330,12 +330,15 @@ DefaultCommit<Impl>::setRenameQueue(TimeBuffer<RenameStruct> *rq_ptr)
 
 template <class Impl>
 void
-DefaultCommit<Impl>::setIEWQueue(TimeBuffer<IEWStruct> *iq_ptr)
+DefaultCommit<Impl>::setIEWQueue(TimeBuffer<IEWStruct> *iq_ptr,
+                                 TimeBuffer<IEWStruct> *iq_ptr2)
 {
     iewQueue = iq_ptr;
+    iewQueueDup = iq_ptr;
 
     // Setup wire to get instructions from IEW.
     fromIEW = iewQueue->getWire(-iewToCommitDelay);
+    fromIEWDup = iewQueue->getWire(-iewToCommitDelay);
 }
 
 template <class Impl>
