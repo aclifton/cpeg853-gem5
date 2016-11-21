@@ -145,7 +145,8 @@ class DefaultRename
     void regProbePoints();
 
     /** Sets the main backwards communication time buffer pointer. */
-    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr);
+    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                       TimeBuffer<TimeStruct> *tb_ptr2);
 
     /** Sets pointer to time buffer used to communicate to the next stage. */
     void setRenameQueue(TimeBuffer<RenameStruct> *rq_ptr);
@@ -328,6 +329,7 @@ class DefaultRename
 
     /** Pointer to main time buffer used for backwards communication. */
     TimeBuffer<TimeStruct> *timeBuffer;
+    TimeBuffer<TimeStruct> *timeBufferDup;
 
     /** Wire to get IEW's output from backwards time buffer. */
     typename TimeBuffer<TimeStruct>::wire fromIEW;

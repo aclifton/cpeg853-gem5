@@ -598,6 +598,7 @@ class FullO3CPU : public BaseO3CPU
 
     /** The main time buffer to do backwards communication. */
     TimeBuffer<TimeStruct> timeBuffer;
+    TimeBuffer<TimeStruct> timeBufferDup;
 
     /** The fetch stage's instruction queue. */
     TimeBuffer<FetchStruct> fetchQueue;

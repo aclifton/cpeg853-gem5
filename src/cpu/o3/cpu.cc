@@ -188,6 +188,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       dcachePort(&iew.ldstQueue, this),
 
       timeBuffer(params->backComSize, params->forwardComSize),
+      timeBufferDup(params->backComSize, params->forwardComSize),
       fetchQueue(params->backComSize, params->forwardComSize),
       decodeQueue(params->backComSize, params->forwardComSize),
       renameQueue(params->backComSize, params->forwardComSize),
@@ -236,9 +237,9 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     // Give each of the stages the time buffer they will use.
     fetch.setTimeBuffer(&timeBuffer);
     decode.setTimeBuffer(&timeBuffer);
-    rename.setTimeBuffer(&timeBuffer);
-    iew.setTimeBuffer(&timeBuffer);
-    iewDup.setTimeBuffer(&timeBuffer);
+    rename.setTimeBuffer(&timeBuffer,&timeBufferDup);
+    iew.setTimeBuffer(&timeBuffer,0);
+    iewDup.setTimeBuffer(&timeBuffer,&timeBufferDup);
     commit.setTimeBuffer(&timeBuffer);
 
     // Also setup each of the stages' queues.
@@ -569,6 +570,7 @@ FullO3CPU<Impl>::tick()
 
     // Now advance the time buffers
     timeBuffer.advance();
+    timeBufferDup.advance();
 
     fetchQueue.advance();
     decodeQueue.advance();
@@ -1057,6 +1059,7 @@ FullO3CPU<Impl>::drain()
         // test in isDrained().
         for (int i = 0; i < timeBuffer.getSize(); ++i) {
             timeBuffer.advance();
+            timeBufferDup.advance();
             fetchQueue.advance();
             decodeQueue.advance();
             renameQueue.advance();

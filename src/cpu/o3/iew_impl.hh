@@ -332,17 +332,22 @@ DefaultIEW<Impl>::startupStage()
 
 template<class Impl>
 void
-DefaultIEW<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr)
+DefaultIEW<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                                TimeBuffer<TimeStruct> *tb_ptr2)
 {
     timeBuffer = tb_ptr;
+    timeBufferDup = tb_ptr2;
+
+    TimeBuffer<TimeStruct> *buffer = isRedundant() ?
+                timeBufferDup : timeBuffer;
 
     // Setup wire to read information from time buffer, from commit.
     fromCommit = timeBuffer->getWire(-commitToIEWDelay);
 
     // Setup wire to write information back to previous stages.
-    toRename = timeBuffer->getWire(0);
+    toRename = buffer->getWire(0);
 
-    toFetch = timeBuffer->getWire(0);
+    toFetch = buffer->getWire(0);
 
     // Instruction queue also needs main time buffer.
     instQueue.setTimeBuffer(tb_ptr);

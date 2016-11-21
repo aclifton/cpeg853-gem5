@@ -195,9 +195,11 @@ DefaultRename<Impl>::regProbePoints()
 
 template <class Impl>
 void
-DefaultRename<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr)
+DefaultRename<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                                   TimeBuffer<TimeStruct> *tb_ptr2)
 {
     timeBuffer = tb_ptr;
+    timeBufferDup = tb_ptr2;
 
     // Setup wire to read information from time buffer, from IEW stage.
     fromIEW = timeBuffer->getWire(-iewToRenameDelay);

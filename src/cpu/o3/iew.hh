@@ -152,7 +152,8 @@ class DefaultIEW : public RedundantObject
     void startupStage();
 
     /** Sets main time buffer used for backwards communication. */
-    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr);
+    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                       TimeBuffer<TimeStruct> *tb_ptr2);
 
     /** Sets time buffer for getting instructions coming from rename. */
     void setRenameQueue(TimeBuffer<RenameStruct> *rq_ptr);
@@ -303,6 +304,7 @@ class DefaultIEW : public RedundantObject
 
     /** Pointer to main time buffer used for backwards communication. */
     TimeBuffer<TimeStruct> *timeBuffer;
+    TimeBuffer<TimeStruct> *timeBufferDup;
 
     /** Wire to write information heading to previous stages. */
     typename TimeBuffer<TimeStruct>::wire toFetch;
