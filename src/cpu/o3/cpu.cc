@@ -167,7 +167,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       decode(this, params),
       rename(this, params),
       iew(this, params),
-      iewDup(this, params),
+      iewDup(this, params,true),
       commit(this, params),
 
       regFile(params->numPhysIntRegs,

@@ -85,7 +85,8 @@ InstructionQueue<Impl>::FUCompletion::description() const
 
 template <class Impl>
 InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
-                                         DerivO3CPUParams *params)
+                                         DerivO3CPUParams *params,
+                                         bool redundant)
     : cpu(cpu_ptr),
       iewStage(iew_ptr),
       fuPool(params->fuPool),
@@ -93,6 +94,7 @@ InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
       totalWidth(params->issueWidth),
       commitToIEWDelay(params->commitToIEWDelay)
 {
+    this->setRedundant(redundant);
     assert(fuPool);
 
     numThreads = params->numThreads;
@@ -112,6 +114,7 @@ InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
     for (ThreadID tid = 0; tid < numThreads; tid++) {
         memDepUnit[tid].init(params, tid);
         memDepUnit[tid].setIQ(this);
+        memDepUnit[tid].setRedundant(redundant);
     }
 
     resetState();
@@ -165,6 +168,13 @@ InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
 }
 
 template <class Impl>
+InstructionQueue<Impl>::InstructionQueue(O3CPU *cpu_ptr, IEW *iew_ptr,
+                                         DerivO3CPUParams *params)
+    : InstructionQueue(cpu_ptr, iew_ptr, params, false)
+{
+}
+
+template <class Impl>
 InstructionQueue<Impl>::~InstructionQueue()
 {
     dependGraph.reset();
@@ -178,7 +188,8 @@ template <class Impl>
 std::string
 InstructionQueue<Impl>::name() const
 {
-    return cpu->name() + ".iq";
+    //Group D mod. Used to avoid stat naming conflicts
+    return cpu->name() + ".iq." + RedundantObject::name();
 }
 
 template <class Impl>
