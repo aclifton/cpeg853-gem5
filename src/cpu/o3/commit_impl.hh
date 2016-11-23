@@ -297,12 +297,15 @@ DefaultCommit<Impl>::setThreads(std::vector<Thread *> &threads)
 
 template <class Impl>
 void
-DefaultCommit<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr)
+DefaultCommit<Impl>::setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                                   TimeBuffer<TimeStruct> *tb_ptr2)
 {
     timeBuffer = tb_ptr;
+    timeBufferDup = tb_ptr2;
 
     // Setup wire to send information back to IEW.
     toIEW = timeBuffer->getWire(0);
+    toIEWDup = timeBuffer->getWire(0);
 
     // Setup wire to read data from IEW (for the ROB).
     robInfoFromIEW = timeBuffer->getWire(-iewToCommitDelay);

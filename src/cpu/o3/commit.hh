@@ -174,7 +174,8 @@ class DefaultCommit
     void setThreads(std::vector<Thread *> &threads);
 
     /** Sets the main time buffer pointer, used for backwards communication. */
-    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr);
+    void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr,
+                       TimeBuffer<TimeStruct> *tb_ptr2);
 
     void setFetchQueue(TimeBuffer<FetchStruct> *fq_ptr);
 
@@ -346,9 +347,11 @@ class DefaultCommit
   private:
     /** Time buffer interface. */
     TimeBuffer<TimeStruct> *timeBuffer;
+    TimeBuffer<TimeStruct> *timeBufferDup;
 
     /** Wire to write information heading to previous stages. */
     typename TimeBuffer<TimeStruct>::wire toIEW;
+    typename TimeBuffer<TimeStruct>::wire toIEWDup;
 
     /** Wire to read information from IEW (for ROB). */
     typename TimeBuffer<TimeStruct>::wire robInfoFromIEW;

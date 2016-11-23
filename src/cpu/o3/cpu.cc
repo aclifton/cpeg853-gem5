@@ -240,7 +240,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     rename.setTimeBuffer(&timeBuffer,&timeBufferDup);
     iew.setTimeBuffer(&timeBuffer,0);
     iewDup.setTimeBuffer(&timeBuffer,&timeBufferDup);
-    commit.setTimeBuffer(&timeBuffer);
+    commit.setTimeBuffer(&timeBuffer,&timeBufferDup);
 
     // Also setup each of the stages' queues.
     fetch.setFetchQueue(&fetchQueue);
