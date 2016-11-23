@@ -457,6 +457,9 @@ FullO3CPU<Impl>::regProbePoints()
     renameDup.regProbePoints();
     /* Group D */
     iew.regProbePoints();
+    /* Group D */
+    iewDup.regProbePoints();
+    /* Group D */
     commit.regProbePoints();
 }
 
