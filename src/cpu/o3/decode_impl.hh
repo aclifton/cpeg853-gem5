@@ -714,7 +714,7 @@ DefaultDecode<Impl>::decodeInsts(ThreadID tid)
         ++toRenameIndex;
 
         ////Group D////
-        toRenameDup->insts[toRenameIndex] = inst;
+        toRenameDup->insts[toRenameDupIndex] = inst;
         ++(toRenameDup->size);
         ++toRenameDupIndex;
         ////Group D////
