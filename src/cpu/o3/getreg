@@ -1,0 +1,3 @@
+iew_impl.hh:1447:                scoreboard->setReg(inst->renamedDestRegIdx(i));
+rename_impl.hh:1063:        if (scoreboard->getReg(renamed_reg)) {
+rename_impl.hh:1126:        scoreboard->unsetReg(rename_result.first);

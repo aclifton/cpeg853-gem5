@@ -193,14 +193,23 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       dcachePort(&iew.ldstQueue, this),
 
       timeBuffer(params->backComSize, params->forwardComSize),
+
+      /* Group D */
+      timeBufferDup(params->backComSize, params->forwardComSize),
+      /* Group D */
+
       fetchQueue(params->backComSize, params->forwardComSize),
       decodeQueue(params->backComSize, params->forwardComSize),
       renameQueue(params->backComSize, params->forwardComSize),
       /* Group D */
       decodeQueueDup(params->backComSize, params->forwardComSize),
       renameQueueDup(params->backComSize, params->forwardComSize),
-      ///Group D////
+      /* Group D */
       iewQueue(params->backComSize, params->forwardComSize),
+
+      /* Group D */
+      iewQueueDup(params->backComSize, params->forwardComSize),
+      /* Group D */
       activityRec(name(), NumStages,
                   params->backComSize + params->forwardComSize,
                   params->activity),
@@ -250,8 +259,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     rename.setTimeBuffer(&timeBuffer);
     iew.setTimeBuffer(&timeBuffer);
     /* Group D */
-    renameDup.setTimeBuffer(&timeBuffer);
-    iewDup.setTimeBuffer(&timeBuffer);
+    renameDup.setTimeBuffer(&timeBufferDup);
+    iewDup.setTimeBuffer(&timeBufferDup);
     /* Group D */
     commit.setTimeBuffer(&timeBuffer);
 
@@ -276,10 +285,9 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     renameDup.setDecodeQueue(&decodeQueueDup);
     renameDup.setRenameQueue(&renameQueueDup);
     iewDup.setRenameQueue(&renameQueueDup);
-    iewDup.setIEWQueue(&iewQueue);
-    renameDup.setIEWStage(&iew);
+    iewDup.setIEWQueue(&iewQueueDup);
+    renameDup.setIEWStage(&iewDup);
     renameDup.setCommitStage(&commit);
-
     /* Group D */
 
     ThreadID active_threads;
@@ -301,11 +309,13 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     assert(params->numPhysCCRegs >= numThreads * TheISA::NumCCRegs);
 
     rename.setScoreboard(&scoreboard);
-    ///Group D///
+    /* Group D */
     renameDup.setScoreboard(&scoreboard);
-    ///Group D///
+    iewDup.setScoreboard(&scoreboard);
+    /* Group D */
 
     iew.setScoreboard(&scoreboard);
+
 
     // Setup the rename map for whichever stages need it.
     for (ThreadID tid = 0; tid < numThreads; tid++) {
@@ -454,12 +464,10 @@ FullO3CPU<Impl>::regProbePoints()
     fetch.regProbePoints();
     rename.regProbePoints();
     /* Group D */
-    renameDup.regProbePoints();
+    //renameDup.regProbePoints();
+    //iewDup.regProbePoints();
     /* Group D */
     iew.regProbePoints();
-    /* Group D */
-    iewDup.regProbePoints();
-    /* Group D */
     commit.regProbePoints();
 }
 
@@ -613,17 +621,28 @@ FullO3CPU<Impl>::tick()
 
     // Now advance the time buffers
     timeBuffer.advance();
+    /* Group D */
+    timeBufferDup.advance();
+    /* Group D */
+
 
     fetchQueue.advance();
     decodeQueue.advance();
     /* Group D */
     decodeQueueDup.advance();
     /* Group D */
+
     renameQueue.advance();
+
     /* Group D */
     renameQueueDup.advance();
     /* Group D */
+
     iewQueue.advance();
+
+    /* Group D */
+    iewQueueDup.advance();
+    /* Group D */
 
     activityRec.advance();
 
@@ -694,6 +713,7 @@ FullO3CPU<Impl>::startup()
     rename.startupStage();
     /* Group D */
     renameDup.startupStage();
+    iewDup.startupStage();
     /* Group D */
     commit.startupStage();
 }
@@ -1107,11 +1127,21 @@ FullO3CPU<Impl>::drain()
             decodeQueue.advance();
             renameQueue.advance();
             /* Group D */
-            decodeQueueDup.advance();
+            /*decodeQueueDup.advance();
             renameQueueDup.advance();
+            iewQueueDup.advance();*/
             /* Group D */
             iewQueue.advance();
         }
+
+        /* Group D*/
+        for (int i = 0; i < timeBufferDup.getSize(); ++i) {
+            timeBufferDup.advance();
+            decodeQueueDup.advance();
+            renameQueueDup.advance();
+            iewQueueDup.advance();
+        }
+        /* Group D */
 
         drainSanityCheck();
         return DrainState::Drained;

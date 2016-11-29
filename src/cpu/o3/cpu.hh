@@ -534,18 +534,18 @@ class FullO3CPU : public BaseO3CPU
     /** The dispatch stage. */
     typename CPUPolicy::Rename rename;
 
-    ////Group D////
+    /* Group D */
     /** The dispatch stage. */
     typename CPUPolicy::Rename renameDup;
-    ////Group D////
+    /* Group D */
 
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iew;
 
-    ////Group D////
+    /* Group D */
     /** The issue/execute/writeback stages. */
     typename CPUPolicy::IEW iewDup;
-    ////Group D////
+    /* Group D */
 
 
     /** The commit stage. */
@@ -609,6 +609,10 @@ class FullO3CPU : public BaseO3CPU
     /** The main time buffer to do backwards communication. */
     TimeBuffer<TimeStruct> timeBuffer;
 
+    /* Group D */
+    TimeBuffer<TimeStruct> timeBufferDup;
+    /* Group D */
+
     /** The fetch stage's instruction queue. */
     TimeBuffer<FetchStruct> fetchQueue;
 
@@ -618,16 +622,21 @@ class FullO3CPU : public BaseO3CPU
     /** The rename stage's instruction queue. */
     TimeBuffer<RenameStruct> renameQueue;
 
-    ////Group D////
+    /* Group D */
     /** The duplicated decode stage's instruction queue. */
     TimeBuffer<DecodeStruct> decodeQueueDup;
 
     /** The duplicated rename stage's instruction queue. */
     TimeBuffer<RenameStruct> renameQueueDup;
-    ////Group D////
+    /* Group D */
 
     /** The IEW stage's instruction queue. */
     TimeBuffer<IEWStruct> iewQueue;
+
+    /* Group D */
+    /** The duplicated iew stage's instruction queue. */
+    TimeBuffer<IEWStruct> iewQueueDup;
+    /* Group D */
 
 
 
