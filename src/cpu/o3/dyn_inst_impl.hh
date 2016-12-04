@@ -309,4 +309,34 @@ BaseO3DynInst<Impl>::verify()
         return true;
 }
 
+template<class Impl>
+void BaseO3DynInst<Impl>::initOtherCopy()
+{
+        BaseO3DynInst<Impl>* instruction;
+        if (this->other == NULL) {
+                instruction = new BaseO3DynInst<Impl>(
+                                this->staticInst,
+                                this->macroop,
+                                this->pc,
+                                this->predPC,
+                                this->seqNum,
+                                this->cpu);
+        } else {
+                instruction = this->other;
+        }
+        this->other = instruction;
+        instruction->setTid(this->threadNumber);
+        instruction->setASID(this->threadNumber);
+        instruction->setThreadState(this->cpu->thread[this->threadNumber]);
+        instruction->traceData = NULL;
+        instruction->setInstListIt(this->getInstListIt());
+        for (int x = 0; x < this->status.size(); x++) {
+                if (this->status.test(x)) {
+                        instruction->status.set(x);
+                } else {
+                        instruction->status.reset(x);
+                }
+        }
+}
+
 #endif//__CPU_O3_DYN_INST_IMPL_HH__

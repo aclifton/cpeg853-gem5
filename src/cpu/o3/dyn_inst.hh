@@ -359,6 +359,8 @@ class BaseO3DynInst : public BaseDynInst<Impl>
 
     bool verify();
 
+    void initOtherCopy();
+
 
 };
 
