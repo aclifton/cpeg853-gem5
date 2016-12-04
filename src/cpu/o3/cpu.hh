@@ -560,6 +560,11 @@ class FullO3CPU : public BaseO3CPU
     /** The rename map. */
     typename CPUPolicy::RenameMap renameMap[Impl::MaxThreads];
 
+    /* Group D */
+    /** The rename map. */
+    typename CPUPolicy::RenameMap renameMapDup[Impl::MaxThreads];
+    /* Group D */
+
     /** The commit rename map. */
     typename CPUPolicy::RenameMap commitRenameMap[Impl::MaxThreads];
 

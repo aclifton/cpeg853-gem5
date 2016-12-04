@@ -195,7 +195,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
       timeBuffer(params->backComSize, params->forwardComSize),
 
       /* Group D */
-      timeBufferDup(params->backComSize, params->forwardComSize),
+       timeBufferDup(params->backComSize, params->forwardComSize),
       /* Group D */
 
       fetchQueue(params->backComSize, params->forwardComSize),
@@ -261,6 +261,8 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     /* Group D */
     renameDup.setTimeBuffer(&timeBufferDup);
     iewDup.setTimeBuffer(&timeBufferDup);
+    //renameDup.setTimeBuffer(&timeBuffer);
+    //iewDup.setTimeBuffer(&timeBuffer);
     /* Group D */
     commit.setTimeBuffer(&timeBuffer);
 
@@ -333,6 +335,10 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
 
         renameMap[tid].init(&regFile, TheISA::ZeroReg, fpZeroReg,
                             &freeList);
+        /* Group D */
+        //renameMapDup[tid].init(&regFile, TheISA::ZeroReg, fpZeroReg,
+                                                //&freeList);
+        /* Group D */
     }
 
     // Initialize rename map to assign physical registers to the
@@ -343,18 +349,27 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
             // want special treatment for the zero register at this point
             PhysRegIndex phys_reg = freeList.getIntReg();
             renameMap[tid].setIntEntry(ridx, phys_reg);
+            /* Group D */
+            //renameMapDup[tid].setIntEntry(ridx, phys_reg);
+            /* Group D */
             commitRenameMap[tid].setIntEntry(ridx, phys_reg);
         }
 
         for (RegIndex ridx = 0; ridx < TheISA::NumFloatRegs; ++ridx) {
             PhysRegIndex phys_reg = freeList.getFloatReg();
             renameMap[tid].setFloatEntry(ridx, phys_reg);
+            /* Group D */
+            //renameMapDup[tid].setFloatEntry(ridx, phys_reg);
+            /* Group D */
             commitRenameMap[tid].setFloatEntry(ridx, phys_reg);
         }
 
         for (RegIndex ridx = 0; ridx < TheISA::NumCCRegs; ++ridx) {
             PhysRegIndex phys_reg = freeList.getCCReg();
             renameMap[tid].setCCEntry(ridx, phys_reg);
+            /* Group D */
+            renameMap[tid].setCCEntry(ridx, phys_reg);
+            /* Group D */
             commitRenameMap[tid].setCCEntry(ridx, phys_reg);
         }
     }
@@ -363,6 +378,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     commit.setRenameMap(commitRenameMap);
     rename.setFreeList(&freeList);
     /* Group D */
+    //renameDup.setRenameMap(renameMapDup);
     renameDup.setRenameMap(renameMap);
     renameDup.setFreeList(&freeList);
     /* Group D */
@@ -464,8 +480,8 @@ FullO3CPU<Impl>::regProbePoints()
     fetch.regProbePoints();
     rename.regProbePoints();
     /* Group D */
-    //renameDup.regProbePoints();
-    //iewDup.regProbePoints();
+    renameDup.regProbePoints();
+    iewDup.regProbePoints();
     /* Group D */
     iew.regProbePoints();
     commit.regProbePoints();
@@ -873,6 +889,9 @@ FullO3CPU<Impl>::insertThread(ThreadID tid)
         PhysRegIndex phys_reg = freeList.getIntReg();
 
         renameMap[tid].setEntry(ireg,phys_reg);
+        /* Group D */
+        //renameMapDup[tid].setEntry(ireg,phys_reg);
+        /* Group D */
         scoreboard.setReg(phys_reg);
     }
 
@@ -882,6 +901,9 @@ FullO3CPU<Impl>::insertThread(ThreadID tid)
         PhysRegIndex phys_reg = freeList.getFloatReg();
 
         renameMap[tid].setEntry(freg,phys_reg);
+        /* Group D */
+        //renameMapDup[tid].setEntry(freg,phys_reg);
+        /* Group D */
         scoreboard.setReg(phys_reg);
     }
 
@@ -892,6 +914,9 @@ FullO3CPU<Impl>::insertThread(ThreadID tid)
         PhysRegIndex phys_reg = freeList.getCCReg();
 
         renameMap[tid].setEntry(creg,phys_reg);
+        /* Group D */
+        //renameMapDup[tid].setEntry(creg,phys_reg);
+        /* Group D */
         scoreboard.setReg(phys_reg);
     }
 
@@ -930,6 +955,11 @@ FullO3CPU<Impl>::removeThread(ThreadID tid)
         PhysRegIndex phys_reg = renameMap[tid].lookup(ireg);
         scoreboard.unsetReg(phys_reg);
         freeList.addReg(phys_reg);
+        /* Group D */
+        /*phys_reg = renameMapDup[tid].lookup(ireg);
+        scoreboard.unsetReg(phys_reg);
+        freeList.addReg(phys_reg);*/
+        /* Group D */
     }
 
     // Unbind Float Regs from Rename Map
@@ -938,6 +968,11 @@ FullO3CPU<Impl>::removeThread(ThreadID tid)
         PhysRegIndex phys_reg = renameMap[tid].lookup(freg);
         scoreboard.unsetReg(phys_reg);
         freeList.addReg(phys_reg);
+        /* Group D */
+        /*phys_reg = renameMapDup[tid].lookup(freg);
+        scoreboard.unsetReg(phys_reg);
+        freeList.addReg(phys_reg);*/
+        /* Group D */
     }
 
     // Unbind condition-code Regs from Rename Map
@@ -946,6 +981,11 @@ FullO3CPU<Impl>::removeThread(ThreadID tid)
         PhysRegIndex phys_reg = renameMap[tid].lookup(creg);
         scoreboard.unsetReg(phys_reg);
         freeList.addReg(phys_reg);
+        /* Group D */
+        /*phys_reg = renameMapDup[tid].lookup(creg);
+        scoreboard.unsetReg(phys_reg);
+        freeList.addReg(phys_reg);*/
+        /* Group D */
     }
 
     // Squash Throughout Pipeline
@@ -955,6 +995,11 @@ FullO3CPU<Impl>::removeThread(ThreadID tid)
     decode.squash(tid);
     rename.squash(squash_seq_num, tid);
     iew.squash(tid);
+    /* Group D */
+    renameDup.squash(squash_seq_num, tid);
+    iewDup.squash(tid);
+    iewDup.ldstQueue.squash(squash_seq_num, tid);
+    /* Group D */
     iew.ldstQueue.squash(squash_seq_num, tid);
     commit.rob->squash(squash_seq_num, tid);
 
@@ -1126,11 +1171,11 @@ FullO3CPU<Impl>::drain()
             fetchQueue.advance();
             decodeQueue.advance();
             renameQueue.advance();
-            /* Group D */
-            /*decodeQueueDup.advance();
+            /* Group D
+            decodeQueueDup.advance();
             renameQueueDup.advance();
-            iewQueueDup.advance();*/
-            /* Group D */
+            iewQueueDup.advance();
+             Group D */
             iewQueue.advance();
         }
 
