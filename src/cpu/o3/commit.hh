@@ -176,6 +176,11 @@ class DefaultCommit
     /** Sets the main time buffer pointer, used for backwards communication. */
     void setTimeBuffer(TimeBuffer<TimeStruct> *tb_ptr);
 
+    /* Group D */
+    void setTimeBufferDup(TimeBuffer<TimeStruct> *tb_ptr);
+    /* Group D */
+
+
     void setFetchQueue(TimeBuffer<FetchStruct> *fq_ptr);
 
     /** Sets the pointer to the queue coming from rename. */
@@ -348,6 +353,9 @@ class DefaultCommit
 
     /** Wire to write information heading to previous stages. */
     typename TimeBuffer<TimeStruct>::wire toIEW;
+    /* Group D */
+    typename TimeBuffer<TimeStruct>::wire toIEWDup;
+    /* Group D */
 
     /** Wire to read information from IEW (for ROB). */
     typename TimeBuffer<TimeStruct>::wire robInfoFromIEW;
