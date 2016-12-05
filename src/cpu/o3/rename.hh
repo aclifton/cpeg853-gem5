@@ -302,10 +302,19 @@ class DefaultRename
      * register for that arch. register, and the new physical register.
      */
     struct RenameHistory {
+//        RenameHistory(InstSeqNum _instSeqNum, RegIndex _archReg,
+//                      PhysRegIndex _newPhysReg, PhysRegIndex _prevPhysReg)
+//            : instSeqNum(_instSeqNum), archReg(_archReg),
+//              newPhysReg(_newPhysReg), prevPhysReg(_prevPhysReg),
+//			  newOtherPhysReg(_newPhysReg)
+//        {
+//        }
         RenameHistory(InstSeqNum _instSeqNum, RegIndex _archReg,
-                      PhysRegIndex _newPhysReg, PhysRegIndex _prevPhysReg)
+                      PhysRegIndex _newPhysReg, PhysRegIndex _prevPhysReg,
+                                          PhysRegIndex _newOtherPhysReg)
             : instSeqNum(_instSeqNum), archReg(_archReg),
-              newPhysReg(_newPhysReg), prevPhysReg(_prevPhysReg)
+              newPhysReg(_newPhysReg), prevPhysReg(_prevPhysReg),
+                          newOtherPhysReg(_newOtherPhysReg)
         {
         }
 
@@ -317,6 +326,9 @@ class DefaultRename
         PhysRegIndex newPhysReg;
         /** The old physical register that the arch. register was renamed to. */
         PhysRegIndex prevPhysReg;
+        /** The other new physical register that
+         * the arch. register is renamed to. */
+        PhysRegIndex newOtherPhysReg;
     };
 
     /** A per-thread list of all destination register renames, used to either

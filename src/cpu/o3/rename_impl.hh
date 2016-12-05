@@ -645,9 +645,9 @@ DefaultRename<Impl>::renameInsts(ThreadID tid)
 
         // Check here to make sure there are enough destination registers
         // to rename to.  Otherwise block.
-        if (!renameMap[tid]->canRename(inst->numIntDestRegs(),
-                                       inst->numFPDestRegs(),
-                                       inst->numCCDestRegs())) {
+        if (!renameMap[tid]->canRename(inst->numIntDestRegs()*2,
+                                       inst->numFPDestRegs()*2,
+                                       inst->numCCDestRegs()*2)) {
             DPRINTF(Rename, "Blocking due to lack of free "
                     "physical registers to rename to.\n");
             blockThisCycle = true;
@@ -698,6 +698,7 @@ DefaultRename<Impl>::renameInsts(ThreadID tid)
             serializeAfter(insts_to_rename, tid);
         }
 
+        inst->initOtherCopy();
         renameSrcRegs(inst, inst->threadNumber);
 
         renameDestRegs(inst, inst->threadNumber);
@@ -941,6 +942,7 @@ DefaultRename<Impl>::doSquash(const InstSeqNum &squashed_seq_num, ThreadID tid)
 
             // Put the renamed physical register back on the free list.
             freeList->addReg(hb_it->newPhysReg);
+            freeList->addReg(hb_it->newOtherPhysReg);
         }
 
         // Notify potential listeners that the register mapping needs to be
@@ -1051,6 +1053,7 @@ DefaultRename<Impl>::renameSrcRegs(DynInstPtr &inst, ThreadID tid)
                 (int)src_reg, (int)flat_rel_src_reg, (int)renamed_reg);
 
         inst->renameSrcReg(src_idx, renamed_reg);
+        inst->other->renameSrcReg(src_idx, renamed_reg);
 
         // See if the register is ready or not.
         if (scoreboard->getReg(renamed_reg)) {
@@ -1058,6 +1061,7 @@ DefaultRename<Impl>::renameSrcRegs(DynInstPtr &inst, ThreadID tid)
                     tid, renamed_reg);
 
             inst->markSrcRegReady(src_idx);
+            inst->other->markSrcRegReady(src_idx);
         } else {
             DPRINTF(Rename, "[tid:%u]: Register %d is not ready.\n",
                     tid, renamed_reg);
@@ -1082,30 +1086,38 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
         RegIndex flat_rel_dest_reg;
         RegIndex flat_uni_dest_reg;
         typename RenameMap::RenameInfo rename_result;
+        RegIndex rel_dest_reg_other;
+        RegIndex flat_rel_dest_reg_other;
+        RegIndex flat_uni_dest_reg_other;
+        typename RenameMap::RenameInfo rename_result_other;
 
         switch (regIdxToClass(dest_reg, &rel_dest_reg)) {
           case IntRegClass:
-            flat_rel_dest_reg = tc->flattenIntIndex(rel_dest_reg);
-            rename_result = map->renameInt(flat_rel_dest_reg);
-            flat_uni_dest_reg = flat_rel_dest_reg;  // 1:1 mapping
+              flat_rel_dest_reg = tc->flattenIntIndex(rel_dest_reg);
+              rename_result = map->renameInt(flat_rel_dest_reg,false);
+              rename_result_other = map->renameInt(flat_rel_dest_reg,true);
+              flat_uni_dest_reg = flat_rel_dest_reg;  // 1:1 mapping
             break;
 
           case FloatRegClass:
-            flat_rel_dest_reg = tc->flattenFloatIndex(rel_dest_reg);
-            rename_result = map->renameFloat(flat_rel_dest_reg);
-            flat_uni_dest_reg = flat_rel_dest_reg + TheISA::FP_Reg_Base;
+              flat_rel_dest_reg = tc->flattenFloatIndex(rel_dest_reg);
+              rename_result = map->renameFloat(flat_rel_dest_reg,false);
+              rename_result_other = map->renameFloat(flat_rel_dest_reg,true);
+              flat_uni_dest_reg = flat_rel_dest_reg + TheISA::FP_Reg_Base;
             break;
 
           case CCRegClass:
             flat_rel_dest_reg = tc->flattenCCIndex(rel_dest_reg);
-            rename_result = map->renameCC(flat_rel_dest_reg);
+            rename_result = map->renameCC(flat_rel_dest_reg,false);
+            rename_result_other = map->renameCC(flat_rel_dest_reg,true);
             flat_uni_dest_reg = flat_rel_dest_reg + TheISA::CC_Reg_Base;
             break;
 
           case MiscRegClass:
             // misc regs don't get flattened
             flat_rel_dest_reg = rel_dest_reg;
-            rename_result = map->renameMisc(flat_rel_dest_reg);
+            rename_result = map->renameMisc(flat_rel_dest_reg,false);
+            rename_result_other = map->renameMisc(flat_rel_dest_reg,true);
             flat_uni_dest_reg = flat_rel_dest_reg + TheISA::Misc_Reg_Base;
             break;
 
@@ -1114,9 +1126,11 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
         }
 
         inst->flattenDestReg(dest_idx, flat_uni_dest_reg);
+        inst->other->flattenDestReg(dest_idx, flat_uni_dest_reg);
 
         // Mark Scoreboard entry as not ready
         scoreboard->unsetReg(rename_result.first);
+        scoreboard->unsetReg(rename_result_other.first);
 
         DPRINTF(Rename, "[tid:%u]: Renaming arch reg %i to physical "
                 "reg %i.\n", tid, (int)flat_rel_dest_reg,
@@ -1125,7 +1139,8 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
         // Record the rename information so that a history can be kept.
         RenameHistory hb_entry(inst->seqNum, flat_uni_dest_reg,
                                rename_result.first,
-                               rename_result.second);
+                               rename_result.second,
+                               rename_result_other.first);
 
         historyBuffer[tid].push_front(hb_entry);
 
@@ -1142,6 +1157,9 @@ DefaultRename<Impl>::renameDestRegs(DynInstPtr &inst, ThreadID tid)
         inst->renameDestReg(dest_idx,
                             rename_result.first,
                             rename_result.second);
+        inst->other->renameDestReg(dest_idx,
+                            rename_result_other.first,
+                            rename_result_other.second);
 
         ++renameRenamedOperands;
     }

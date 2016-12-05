@@ -854,7 +854,14 @@ DefaultIEW<Impl>::sortInsts()
         assert(insts[tid].empty());
 #endif
     for (int i = 0; i < insts_from_rename; ++i) {
-        insts[fromRename->insts[i]->threadNumber].push(fromRename->insts[i]);
+        if (isRedundant()){
+            insts[fromRename->insts[i]->threadNumber]
+                                  .push(fromRename->insts[i]->other);
+        }
+        else{
+            insts[fromRename->insts[i]->threadNumber]
+                                  .push(fromRename->insts[i]);
+        }
     }
 }
 
