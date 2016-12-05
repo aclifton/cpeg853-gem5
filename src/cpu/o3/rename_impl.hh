@@ -996,6 +996,7 @@ DefaultRename<Impl>::removeFromHistory(InstSeqNum inst_seq_num, ThreadID tid)
         // the old one.
         if (hb_it->newPhysReg != hb_it->prevPhysReg) {
             freeList->addReg(hb_it->prevPhysReg);
+            freeList->addReg(hb_it->newOtherPhysReg);
         }
 
         ++renameCommittedMaps;
