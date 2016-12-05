@@ -331,6 +331,48 @@ class BaseO3DynInst : public BaseDynInst<Impl>
     {
         return this->staticInst->memAccInst()->execute(this, this->traceData);
     }
+
+    /**
+     * Group D additions
+     */
+    BaseO3DynInst* other;
+
+    IntReg readIntRegDestination(int idx)
+    {
+        return this->cpu->readIntReg(this->_destRegIdx[idx]);
+    }
+
+    FloatReg readFloatRegDestination(int idx)
+    {
+        return this->cpu->readFloatReg(this->_destRegIdx[idx]);
+    }
+
+    FloatRegBits readFloatRegDestinationBits(int idx)
+    {
+        return this->cpu->readFloatRegBits(this->_destRegIdx[idx]);
+    }
+
+    CCReg readCCRegDestination(int idx)
+    {
+        return this->cpu->readCCReg(this->_destRegIdx[idx]);
+    }
+
+    bool verify();
+
+    void initOtherCopy();
+
+    /*
+     * Calls methods that need to propagate to other copy
+     */
+
+    void renameSrcReg(int idx, PhysRegIndex renamed_src)
+    {
+        BaseDynInst<Impl>::renameSrcReg(idx, renamed_src);
+        if (this->other != NULL)
+                this->other->renameSrcReg(idx, renamed_src);
+    }
+
+
 };
 
 #endif // __CPU_O3_ALPHA_DYN_INST_HH__
