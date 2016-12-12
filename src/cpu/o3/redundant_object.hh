@@ -1,6 +1,4 @@
- /*
- * Authors: Andrew Clifton
- */
+ /* Group D */
 
 #ifndef __CPU_O3_REDUNDANT_OBJECT_HH__
 #define __CPU_O3_REDUNDANT_OBJECT_HH__
@@ -20,3 +18,5 @@ class RedundantObject {
 };
 
 #endif
+
+/* Group D */
