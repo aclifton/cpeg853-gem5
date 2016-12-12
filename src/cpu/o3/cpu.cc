@@ -291,7 +291,7 @@ FullO3CPU<Impl>::FullO3CPU(DerivO3CPUParams *params)
     renameDup.setDecodeQueue(&decodeQueueDup);
     renameDup.setRenameQueue(&renameQueueDup);
     iewDup.setRenameQueue(&renameQueueDup);
-    iewDup.setIEWQueue(&iewQueueDup);
+    iewDup.setIEWQueue(&iewQueue);
     renameDup.setIEWStage(&iewDup);
     renameDup.setCommitStage(&commit);
     /* Group D */
