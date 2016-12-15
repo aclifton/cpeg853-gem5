@@ -599,7 +599,7 @@ InstructionQueue<Impl>::insert(DynInstPtr &new_inst)
     addToProducers(new_inst);
 
     /* Group D */
-    if (new_inst->other!=NULL){
+    if (new_inst->isRedundant()!=true){
       if (new_inst->isMemRef()) {
           memDepUnit[new_inst->threadNumber].insert(new_inst);
       } else {
@@ -644,7 +644,7 @@ InstructionQueue<Impl>::insertNonSpec(DynInstPtr &new_inst)
 
     // If it's a memory instruction, add it to the memory dependency
     // unit.
-    if (new_inst->other!=NULL){
+    if (new_inst->isRedundant()!=true){
       if (new_inst->isMemRef()) {
           memDepUnit[new_inst->threadNumber].insertNonSpec(new_inst);
       }
@@ -661,7 +661,7 @@ template <class Impl>
 void
 InstructionQueue<Impl>::insertBarrier(DynInstPtr &barr_inst)
 {
-    if (barr_inst->other!=NULL){
+    if (barr_inst->isRedundant()!=true){
       memDepUnit[barr_inst->threadNumber].insertBarrier(barr_inst);
     }
 
@@ -969,7 +969,7 @@ InstructionQueue<Impl>::wakeDependents(DynInstPtr &completed_inst)
 
   int dependents = 0;
 /* Group D */
-if (completed_inst->other!=NULL) {
+if (completed_inst->isRedundant()!=true) {
   // The instruction queue here takes care of both floating and int ops
   if (completed_inst->isFloating()) {
       fpInstQueueWakeupQccesses++;
@@ -1106,7 +1106,7 @@ InstructionQueue<Impl>::completeMemInst(DynInstPtr &completed_inst)
 
     completed_inst->memOpDone(true);
     /* Group D */
-  if (completed_inst->other!=NULL){
+  if (completed_inst->isRedundant()!=true){
     memDepUnit[tid].completed(completed_inst);
   }
     count[tid]--;
@@ -1408,7 +1408,7 @@ InstructionQueue<Impl>::addIfReady(DynInstPtr &inst)
             // Message to the mem dependence unit that this instruction has
             // its registers ready.
             /* Group D */
-            if (inst->other!=NULL){
+            if (inst->isRedundant()!=true){
               memDepUnit[inst->threadNumber].regsReady(inst);
             }
 

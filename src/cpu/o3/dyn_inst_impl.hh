@@ -324,7 +324,10 @@ void BaseO3DynInst<Impl>::initOtherCopy()
         } else {
                 instruction = this->other;
         }
+        this->setRedundant(false);
+        instruction->setRedundant(true);
         this->other = instruction;
+        instruction->other=this;
         instruction->setTid(this->threadNumber);
         instruction->setASID(this->threadNumber);
         instruction->setThreadState(this->cpu->thread[this->threadNumber]);
