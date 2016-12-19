@@ -189,6 +189,10 @@ class DefaultCommit
     /** Sets the pointer to the queue coming from IEW. */
     void setIEWQueue(TimeBuffer<IEWStruct> *iq_ptr);
 
+    /* Group D */
+    void setIEWQueueDup(TimeBuffer<IEWStruct> *iq_ptr);
+    /* Group D */
+
     /** Sets the pointer to the IEW stage. */
     void setIEWStage(IEW *iew_stage);
 
@@ -369,6 +373,10 @@ class DefaultCommit
 
     /** Wire to read information from IEW queue. */
     typename TimeBuffer<IEWStruct>::wire fromIEW;
+
+    /* Group D */
+    typename TimeBuffer<IEWStruct>::wire fromIEWDup;
+    /* Group D */
 
     /** Rename instruction queue interface, for ROB. */
     TimeBuffer<RenameStruct> *renameQueue;

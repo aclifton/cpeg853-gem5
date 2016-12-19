@@ -350,6 +350,19 @@ DefaultCommit<Impl>::setIEWQueue(TimeBuffer<IEWStruct> *iq_ptr)
     fromIEW = iewQueue->getWire(-iewToCommitDelay);
 }
 
+/* Group D */
+template <class Impl>
+void
+DefaultCommit<Impl>::setIEWQueueDup(TimeBuffer<IEWStruct> *iq_ptr)
+{
+    iewQueue = iq_ptr;
+
+    // Setup wire to get instructions from IEW.
+    fromIEWDup = iewQueue->getWire(-iewToCommitDelay);
+}
+/* Group D */
+
+
 template <class Impl>
 void
 DefaultCommit<Impl>::setIEWStage(IEW *iew_stage)
