@@ -272,15 +272,14 @@ BaseO3DynInst<Impl>::verify()
         unsigned num_dest_regs = this->numDestRegs();
         // Verify the destination registers.
         for (int dest_idx = 0; dest_idx < num_dest_regs; dest_idx++) {
-        TheISA::RegIndex dest_reg = this->destRegIdx(dest_idx);
-        TheISA::RegIndex rel_dest_reg;
+        TheISA::RegIndex dest_reg = this->renamedDestRegIdx(dest_idx);
                 IntReg intValue1;
                 IntReg intValue2;
                 FloatReg floatValue1;
                 FloatReg floatValue2;
                 CCReg ccValue1;
                 CCReg ccValue2;
-                switch (regIdxToClass(dest_reg, &rel_dest_reg)) {
+                switch (regIdxToClass(dest_reg)) {
                 case IntRegClass:
                         intValue1 = readIntRegDestination(dest_reg);
                         intValue2 = other->readIntRegDestination(dest_reg);
