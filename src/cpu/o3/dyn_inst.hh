@@ -340,22 +340,24 @@ class BaseO3DynInst : public BaseDynInst<Impl>, public RedundantObject
 
     IntReg readIntRegDestination(int idx)
     {
-        return this->cpu->readIntReg(this->_destRegIdx[idx]);
+        //return this->cpu->readIntReg(this->_destRegIdx[idx]);
+        return this->cpu->readIntReg(idx);
+
     }
 
     FloatReg readFloatRegDestination(int idx)
     {
-        return this->cpu->readFloatReg(this->_destRegIdx[idx]);
+        return this->cpu->readFloatReg(idx);
     }
 
     FloatRegBits readFloatRegDestinationBits(int idx)
     {
-        return this->cpu->readFloatRegBits(this->_destRegIdx[idx]);
+        return this->cpu->readFloatRegBits(idx);
     }
 
     CCReg readCCRegDestination(int idx)
     {
-        return this->cpu->readCCReg(this->_destRegIdx[idx]);
+        return this->cpu->readCCReg(idx);
     }
 
     bool verify();
@@ -366,4 +368,3 @@ class BaseO3DynInst : public BaseDynInst<Impl>, public RedundantObject
 };
 
 #endif // __CPU_O3_ALPHA_DYN_INST_HH__
-
